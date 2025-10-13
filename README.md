@@ -46,6 +46,14 @@ poetry install --no-root
 poetry env use python3.13
 # Вход в виртуальное окружение
 $(poetry env activate)
+
+# Можно установить с помощью pip
+# Создание python окружение
+python -m venv .venv
+# Активирование его
+source .venv/bin/activate
+# Установка пакетов из requirements.txt
+pip install -r requirements.txt
 ```
 
 > Убедитесь, что у вас установлены `xvfb` и `libnotify-bin`:
@@ -59,7 +67,7 @@ $(poetry env activate)
 ## ▶️ Запуск
 
 ```bash
-fastapi run service.py
+python main.py
 ```
 
 Сервер запустится на `http://127.0.0.1:8000`.
@@ -80,16 +88,20 @@ curl -X POST http://127.0.0.1:8000/chat \
 ```
 
 > Доступные модели `duck_chat/models/model_type.py`:
-> - `GPT4o` → **gpt-4o-mini**
-> - `Claude` → **claude-3-5-haiku-latest**
-> - `Llama` → **meta-llama/Llama-4-Scout-17B-16E-Instruct**
-> - `Mistral` → **mistralai/Mistral-Small-24B-Instruct-2501**
-> - `O4Mini` → **o4-mini**
+- `Gpt4OMini` → **gpt-4o-mini**
+- `Gpt4OMini` = **gpt-4o-mini**
+- `Gpt5Mini` = **gpt-5-mini**
+- `GptOss120B` = **openai/gpt-oss-120b**
+- `Llama4Scout17B16EInstruct` = **meta-llama/Llama-4-Scout-17B-16E-Instruct**
+- `Claude35HaikuLatest` = **claude-3-5-haiku-latest**
+- `MistralSmall24BInstruct2501` = **mistralai/Mistral-Small-24B-Instruct-2501**
 
 **Ответ:**
 ```json
 "Привет! Я — искусственный интеллект, готовый помочь тебе с любыми вопросами…"
 ```
+
+> ⚠️ Список моделей автоматически парсится с Duck.ai API сервисом при запуске сервиса - поэтому выше приведенный перечень моделей может быть устаревшим, смотрите `duck_chat/models/model_type.py`
 
 ---
 
@@ -123,6 +135,7 @@ duck-local-chat-api/
 ## ⚠️ Ограничения
 
 - Только **Linux** (из-за `xvfb` и `notify-send`)
+- Не учитывается история чата при отправке нового промпта (нужна лишь для корректной валидации основго промпта)
 - Работает только пока заголовки валидны (время жизни — 5-10 запросов)
 - Не предназначен для массового использования (следуйте правилам duck.ai)
 - Требует доступа к Chromium и GUI-совместимых инструментов

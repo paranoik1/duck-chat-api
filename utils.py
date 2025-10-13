@@ -1,17 +1,18 @@
-from pathlib import Path
-from typing import Any
+import importlib
 import logging
 import sys
-import importlib
-from importlib.util import spec_from_file_location, module_from_spec
-import aiofiles # type: ignore
-from bs4 import BeautifulSoup
-from patchright.async_api import Playwright, TimeoutError, async_playwright, BrowserContext, Page
-from xvfbwrapper import Xvfb  # type: ignore
-from os.path import getmtime
-from time import ctime
 from datetime import datetime
+from importlib.util import module_from_spec, spec_from_file_location
+from os.path import getmtime
+from pathlib import Path
+from time import ctime
+from typing import Any
 
+import aiofiles  # type: ignore
+from bs4 import BeautifulSoup
+from patchright.async_api import (BrowserContext, Page, Playwright,
+                                  TimeoutError, async_playwright)
+from xvfbwrapper import Xvfb  # type: ignore
 
 MODELS_TYPE_PATH = Path(__file__).parent / "duck_chat" / "models" / "model_type.py"
 DUCK_AI_URL = "https://duck.ai"
@@ -39,7 +40,9 @@ async def accept_privacy_terms(page: Page):
     try:
         await button.click(timeout=2000)
     except TimeoutError:
-        utils_logger.warning("Timeout error: не найдена кнопка для принятия политики конфиденциальности")
+        utils_logger.warning(
+            "Timeout error: не найдена кнопка для принятия политики конфиденциальности"
+        )
 
 
 @xvfb
@@ -68,7 +71,7 @@ async def get_headers() -> dict[str, Any] | None:
         if response.status == 200:
             # vqd = await request.header_value(vqd_header_name)
             return response.request.headers
-        
+
         utils_logger.critical("Не удалось получить headers запроса", stack_info=True)
 
 
@@ -99,9 +102,9 @@ def __parse_models(html: str) -> dict[str, str]:
     # Parse the content of the webpage
     soup = BeautifulSoup(html, "html.parser")
 
-    # Find all tags and extract their names 
+    # Find all tags and extract their names
     # Не парсятся модели, требующие DuckDuckGo Pro
-    models_inputs = soup.select('ul[role=radiogroup]:nth-child(1) input[name=model]')
+    models_inputs = soup.select("ul[role=radiogroup]:nth-child(1) input[name=model]")
 
     # Get models data
     data = {}
@@ -112,7 +115,9 @@ def __parse_models(html: str) -> dict[str, str]:
             raise ValueError("model_id не получен из атриббута value: " + str(input))
         elif not isinstance(model_id, str):
             # utils_logger.critical("model_id не является строкой (был получен {type(model_id)})")
-            raise ValueError(f"model_id не является строкой (был получен {type(model_id)})")
+            raise ValueError(
+                f"model_id не является строкой (был получен {type(model_id)})"
+            )
 
         model_name = "".join(
             [part.title() for part in model_id.split("/")[-1].split("-")]
@@ -127,9 +132,9 @@ async def __write_models(data: dict[str, str], path: Path) -> None:
         await f.write("from enum import Enum\n\n\nclass ModelType(Enum):\n")
         for k, v in data.items():
             await f.write(f'    {k} = "{v}"\n')
-        
+
         first_model = list(data.keys())[0]
-        await f.write(f'    DEFAULT = {first_model}')
+        await f.write(f"    DEFAULT = {first_model}")
 
 
 def __reload_models_type_module() -> None:
@@ -138,12 +143,14 @@ def __reload_models_type_module() -> None:
     # Если модуль уже загружен — перезагружаем
     if module_name in sys.modules:
         importlib.reload(sys.modules[module_name])
-        utils_logger.info(f"[+] Модуль {module_name} перезагружен")
+        utils_logger.info(f"Модуль {module_name} перезагружен")
     else:
         # Если не загружен — импортируем впервые
         spec = spec_from_file_location(module_name, MODELS_TYPE_PATH)
         if spec is None or spec.loader is None:
-            raise FileNotFoundError(f"Не удалось загрузить модуль из {MODELS_TYPE_PATH}")
+            raise FileNotFoundError(
+                f"Не удалось загрузить модуль из {MODELS_TYPE_PATH}"
+            )
         module = module_from_spec(spec)
         sys.modules[module_name] = module
         spec.loader.exec_module(module)
@@ -151,11 +158,12 @@ def __reload_models_type_module() -> None:
 
 
 def needs_editing() -> bool:
-    """    
-    Логика проверки необходимости редактирования
+    """
+    Логика проверки необходимости редактирования (проверяется день обновления файла)
+
     Возвращаем True, если редактирование необходимо, иначе False
     """
-    
+
     mtime = getmtime(MODELS_TYPE_PATH)
     date_string = ctime(mtime)
     date_last_updated = datetime.strptime(date_string, "%a %b %d %H:%M:%S %Y")
@@ -177,7 +185,6 @@ async def generate_models() -> None:
 
 if __name__ == "__main__":
     import asyncio
-    from pprint import pprint
 
     asyncio.run(generate_models())
 

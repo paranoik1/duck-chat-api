@@ -1,3 +1,4 @@
+import logging
 from asyncio import create_task
 from contextlib import asynccontextmanager
 from subprocess import Popen
@@ -12,9 +13,12 @@ from headers_manager import HeadersManager
 from utils import get_headers
 
 
+service_logger = logging.getLogger("fastapi.service")
+
+
 class Prompt(BaseModel):
     content: str
-    model: ModelType = ModelType.GPT4o
+    model: ModelType = ModelType.DEFAULT
 
 
 def notify():
@@ -22,11 +26,13 @@ def notify():
 
 
 async def background_save_headers():
-    print("Background task started")
+    service_logger.info("Запущена функция для получения headers")
+
     headers = await get_headers()
-    print("Fetched Headers")
+    service_logger.info("headers получены")
+
     await HeadersManager().save_headers(headers)
-    print("Saved Headers")
+    service_logger.info("headers сохранен")
 
     notify()
 
@@ -44,21 +50,29 @@ app = FastAPI(lifespan=lifespan)
 
 
 @app.post("/chat", response_model=str)
-async def chat(prompt: Prompt, background_tasks: BackgroundTasks):
+async def chat(prompt: Prompt):
     headers = HeadersManager().get()
 
     async with DuckChat(headers, prompt.model) as duck:
         try:
             return await duck.ask_question(prompt.content)
         except ChallengeException:
-            # print(background_tasks.tasks)
-            # background_tasks.add_task(background_save_headers)
-            create_task(background_save_headers())
+            # create_task(background_save_headers())
 
-            raise HTTPException(
-                418,
-                "Произошла ошибка проверки заголовков... Была создана фоновая задача для получения новых заголовков! Попробуйте позже",
-            )
+            # raise HTTPException(
+            #     418,
+            #     "Произошла ошибка проверки заголовков... Была создана фоновая задача для получения новых заголовков! Попробуйте позже",
+            # )
+
+            await background_save_headers()
+
+            headers = HeadersManager().get()
+            duck.set_headers(headers)
+
+            return await duck.ask_question(prompt.content)
         except DuckChatException:
-            print_exc()
-            raise HTTPException(500, format_exc())
+            service_logger.critical(
+                "Произошла неизвестная ошибка при отправке сообщения Duck.AI...",
+                stack_info=True,
+            )
+            raise HTTPException(500)

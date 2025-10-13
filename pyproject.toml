@@ -15,7 +15,7 @@ dependencies = [
     "bs4 (>=0.0.2,<0.0.3)",
     "xvfbwrapper (>=0.2.13,<0.3.0)",
     "aiofiles (>=24.1.0,<25.0.0)",
-    "fastapi[standard] (>=0.116.1,<0.117.0)"
+    "fastapi[standard] (>=0.116.1,<0.117.0)",
 ]
 
 [tool.poetry.dependencies]
@@ -24,3 +24,8 @@ python = ">=3.13,<4.0"
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "ipykernel (>=6.30.1,<7.0.0)"
+]
