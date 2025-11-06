@@ -1,5 +1,5 @@
 [project]
-name = "duck_chat"
+name = "duck_chat_api"
 version = "0.2.0"
 description = "DuckDuckGo Chat AI client"
 authors = [

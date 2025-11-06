@@ -3,7 +3,7 @@ import logging
 
 import uvicorn
 
-from duck_chat.service.service import app
+from duck_chat_api.service.service import app
 
 # Настройка аргументов командной строки с argparse
 parser = argparse.ArgumentParser(prog="duck-api-service", description="Запуск сервиса")

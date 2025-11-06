@@ -5,10 +5,10 @@ from typing import Any
 from fastapi import FastAPI, HTTPException, UploadFile, Form
 from pydantic import BaseModel
 
-from duck_chat import DuckChat, ModelType, PartText, PartSource, PartImage, Part
-from duck_chat.exceptions import ChallengeException, DuckChatException, RatelimitException
-from duck_chat.service.headers_manager import HeadersManager
-from duck_chat.utils.headers import get_headers
+from duck_chat_api import DuckChat, ModelType, PartText, PartSource, PartImage, Part
+from duck_chat_api.exceptions import ChallengeException, DuckChatException, RatelimitException
+from duck_chat_api.service.headers_manager import HeadersManager
+from duck_chat_api.utils.headers import get_headers
 from base64 import b64encode
 
 # from subprocess import Popen

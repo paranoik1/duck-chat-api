@@ -2,8 +2,6 @@ from typing import Any
 
 from msgspec import Struct
 
-from duck_chat.parts import Part
-
 from .extra import Source, StateTool
 from .parts import Part, PartSource, PartText, PartTool
 

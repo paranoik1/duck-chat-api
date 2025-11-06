@@ -22,7 +22,7 @@
 ### Установка основной библиотеки:
 
 ```bash
-pip install git+https://github.com/paranoik1/duck-chat
+pip install git+https://github.com/paranoik1/duck-chat-api
 ```
 
 ### Установка с дополнительными зависимостями для API-сервиса:
@@ -52,8 +52,8 @@ poetry install --with api-service,dev
 
 ```python
 import asyncio
-from duck_chat import DuckChat, ModelType
-from duck_chat.utils.headers import get_headers
+from duck_chat_api import DuckChat, ModelType
+from duck_chat_api.utils.headers import get_headers
 
 async def main():
     headers = await get_headers()
@@ -70,8 +70,8 @@ asyncio.run(main())
 
 ```python
 import asyncio
-from duck_chat import DuckChat, PartText, PartImage
-from duck_chat.utils.headers import get_headers
+from duck_chat_api import DuckChat, PartText, PartImage
+from duck_chat_api.utils.headers import get_headers
 import base64
 
 
@@ -111,7 +111,7 @@ duck-api-service --host 0.0.0.0 --port 8000 --log-level info
 ### Программно:
 
 ```python
-from duck_chat.service import app
+from duck_chat_api.service import app
 import uvicorn
 
 if __name__ == "__main__":
@@ -138,7 +138,7 @@ curl -X POST http://localhost:8000/chat \
 ## 🖥️ Архитектура библиотеки
 
 ```
-duck_chat/
+duck_chat_api/
 ├── __init__.py           # Основные импорты
 ├── api.py                # Класс DuckChat для взаимодействия с API
 ├── event.py              # Обработка событий от DuckDuckGo
@@ -172,8 +172,8 @@ duck_chat/
 Для получения актуального списка моделей используйте:
 
 ```python
-from duck_chat.utils.models import get_models_page_html, parse_models
-from duck_chat.service.utils import generate_models
+from duck_chat_api.utils.models import get_models_page_html, parse_models
+from duck_chat_api.service.utils import generate_models
 import asyncio
 from pprint import pprint
 
@@ -190,7 +190,7 @@ asyncio.run(print_models())
 
 ## 🧩 Работа с частями сообщений (Parts)
 
-Библиотека `duck_chat` использует концепцию "частей сообщений" (parts) для гибкого формирования запросов и обработки ответов. Все части сообщений наследуются от базового класса `Part` и имеют специфическую структуру.
+Библиотека `duck_chat_api` использует концепцию "частей сообщений" (parts) для гибкого формирования запросов и обработки ответов. Все части сообщений наследуются от базового класса `Part` и имеют специфическую структуру.
 
 ### Доступные типы частей сообщений
 
@@ -241,8 +241,8 @@ asyncio.run(print_models())
 
 ```python
 import asyncio
-from duck_chat import DuckChat, PartText, PartImage, PartSource
-from duck_chat.utils.headers import get_headers
+from duck_chat_api import DuckChat, PartText, PartImage, PartSource
+from duck_chat_api.utils.headers import get_headers
 import base64
 
 async def chat_with_image():
